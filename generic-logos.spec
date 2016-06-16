@@ -1,6 +1,6 @@
 Name:       generic-logos
 Version:    17.0.1
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Icons and pictures
 
 Group:      System Environment/Base
@@ -153,6 +153,9 @@ rm -rf %{buildroot}
 %{_datadir}/pixmaps/poweredby.png
 
 %changelog
+* Thu Jun 16 2016 Vaughan <vaughan at agrez dot net> - 17.0.1-2
+- Rebuild for FedBerry 24
+
 * Sun Nov 08 2015 Vaughan <vaughan at agrez dot net> - 17.0.1-1
 - Fix missing initial-setup gui buttons:
   added topbar-bg.png & sidebar-bg.png to /usr/share/anaconda/pixmaps/
