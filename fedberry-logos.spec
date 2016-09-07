@@ -1,48 +1,32 @@
-Name:       generic-logos
-Version:    17.0.1
-Release:    2%{?dist}
+Name:       fedberry-logos
+Version:    24.0
+Release:    1%{?dist}
 Summary:    Icons and pictures
-
 Group:      System Environment/Base
-URL:        https://fedorahosted.org/generic-logos/ 
-Source0:    https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.xz
+URL:        https://github.com/fedberry/fedberry-logos
+Source0:    https://github.com/fedberry/fedberry-logos/raw/master/%{name}-%{version}.tar.bz2
 #The KDE Logo is under a LGPL license (no version statement)
 License:    GPLv2 and LGPLv2+
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:  noarch
-
-Obsoletes:  redhat-logos
-Obsoletes:  generic-logos < 17.0.0-5
-Provides:   redhat-logos = %{version}-%{release}
-Provides:   system-logos = %{version}-%{release}
-
+Obsoletes:  fedora-logos
+Provides:   fedora-logos
 Conflicts:  fedora-logos
-Conflicts:  anaconda-images <= 10
-Conflicts:  redhat-artwork <= 5.0.5
+Provides:   system-logos
 BuildRequires: hardlink
 # For _kde4_* macros:
 BuildRequires: kde-filesystem
 # For generating the EFI icon
 BuildRequires: libicns-utils
+# For optimizing png files
+BuildRequires: optipng
+# For generating the EFI icon
+BuildRequires: ImageMagick
 Requires(post): coreutils
 
 %description
-The generic-logos package contains various image files which can be
-used by the bootloader, anaconda, and other related tools. It can
-be used as a replacement for the fedora-logos package, if you are
-unable for any reason to abide by the trademark restrictions on the
-fedora-logos or fedora-remix-logos package.
-
-%package httpd
-Summary: Fedora-related icons and pictures used by httpd
-Provides: system-logos-httpd = %{version}-%{release}
-Provides: fedora-logos-httpd = %{version}-%{release}
-Obsoletes:  generic-logos < 17.0.0-5
-BuildArch: noarch
-
-%description httpd
-The generic-logos-httpd package contains image files which can be used by
-httpd.
+The fedberry-logos package contains various image files which can be
+used by the bootloader, anaconda, and other related tools.
 
 %prep
 %setup -q
@@ -53,10 +37,10 @@ make
 %install
 rm -rf %{buildroot}
 
-# should be ifarch i386
+%ifarch i686 x86_64
 mkdir -p %{buildroot}/boot/grub
 install -p -m 644 bootloader/splash.xpm.gz %{buildroot}/boot/grub/splash.xpm.gz
-# end i386 bits
+%endif
 
 
 mkdir -p %{buildroot}%{_datadir}/firstboot/themes/generic
@@ -79,54 +63,73 @@ for i in pixmaps/* ; do
   install -p -m 644 $i %{buildroot}%{_datadir}/pixmaps
 done
 
-mkdir -p %{buildroot}%{_kde4_iconsdir}/oxygen/48x48/apps/
-install -p -m 644 icons/Fedora/48x48/apps/* %{buildroot}%{_kde4_iconsdir}/oxygen/48x48/apps/
-mkdir -p %{buildroot}%{_kde4_appsdir}/ksplash/Themes/Leonidas/2048x1536
-install -p -m 644 ksplash/SolarComet-kde.png %{buildroot}%{_kde4_appsdir}/ksplash/Themes/Leonidas/2048x1536/logo.png
-
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/plymouth/themes/charge/
 for i in plymouth/charge/* ; do
     install -p -m 644 $i $RPM_BUILD_ROOT%{_datadir}/plymouth/themes/charge/
 done
 
-# File or directory names do not count as trademark infringement
-mkdir -p %{buildroot}%{_datadir}/icons/Fedora/48x48/apps/
-mkdir -p %{buildroot}%{_datadir}/icons/Fedora/scalable/apps/
-install -p -m 644 icons/Fedora/48x48/apps/* %{buildroot}%{_datadir}/icons/Fedora/48x48/apps/
-install	-p -m 644 icons/Fedora/scalable/apps/* %{buildroot}%{_datadir}/icons/Fedora/scalable/apps/
+for size in 16x16 22x22 24x24 32x32 36x36 48x48 96x96 256x256 ; do
+  mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$size/apps
+  mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/Bluecurve/$size/apps
+  pushd $RPM_BUILD_ROOT%{_datadir}/icons/Bluecurve/$size/apps
+  ln -s ../../../hicolor/$size/apps/fedberry-logo-icon.png icon-panel-menu.png
+  ln -s ../../../hicolor/$size/apps/fedberry-logo-icon.png gnome-main-menu.png
+  ln -s ../../../hicolor/$size/apps/fedberry-logo-icon.png kmenu.png
+  ln -s ../../../hicolor/$size/apps/fedberry-logo-icon.png start-here.png
+  popd
+  for i in icons/hicolor/$size/apps/* ; do
+    install -p -m 644 $i $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$size/apps
+  done
+done
+
+mkdir -p $RPM_BUILD_ROOT%{_kde4_iconsdir}/oxygen/48x48/apps/
+install -p -m 644 icons/hicolor/48x48/apps/anaconda.png $RPM_BUILD_ROOT%{_kde4_iconsdir}/oxygen/48x48/apps/
+mkdir -p $RPM_BUILD_ROOT%{_kde4_iconsdir}/oxygen/scalable/apps/
+install -p -m 644 icons/hicolor/scalable/apps/anaconda.svg $RPM_BUILD_ROOT%{_kde4_iconsdir}/oxygen/scalable/apps/
+
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
+pushd $RPM_BUILD_ROOT%{_sysconfdir}
+ln -s %{_datadir}/icons/hicolor/16x16/apps/fedberry-logo-icon.png favicon.png
+popd
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+install -p -m 644 icons/hicolor/scalable/apps/xfce4_xicon1.svg $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+install -p -m 644 icons/hicolor/scalable/apps/fedberry-logo-icon.svg $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps/start-here.svg
+install -p -m 644 icons/hicolor/scalable/apps/anaconda.svg $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps/anaconda.svg
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/places/
+pushd $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/places/
+ln -s ../apps/start-here.svg .
+popd
 
 (cd anaconda; make DESTDIR=%{buildroot} install)
 
 # save some dup'd icons
-/usr/sbin/hardlink -v %{buildroot}/
+/usr/sbin/hardlink -v %{buildroot}/usr
 
 %post
+touch --no-create %{_datadir}/icons/hicolor || :
+touch --no-create %{_datadir}/icons/Bluecurve || :
 touch --no-create %{_datadir}/icons/Fedora || :
 touch --no-create %{_kde4_iconsdir}/oxygen ||:
 
 %postun
 if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/Fedora || :
-touch --no-create %{_kde4_iconsdir}/oxygen ||:
-if [ -x /usr/bin/gtk-update-icon-cache ]; then
-  if [ -f %{_datadir}/icons/Fedora/index.theme ]; then
-    gtk-update-icon-cache --quiet %{_datadir}/icons/Fedora || :
-  fi
-  if [ -f %{_kde4_iconsdir}/Fedora-KDE/index.theme ]; then
-    gtk-update-icon-cache --quiet %{_kde4_iconsdir}/Fedora-KDE/index.theme || :
-  fi
-fi
+  touch --no-create %{_datadir}/icons/hicolor || :
+  touch --no-create %{_datadir}/icons/Bluecurve || :
+  touch --no-create %{_datadir}/icons/Fedora || :
+  touch --no-create %{_kde4_iconsdir}/oxygen ||:
+  gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+  gtk-update-icon-cache %{_datadir}/icons/Bluecurve &>/dev/null || :
+  gtk-update-icon-cache %{_datadir}/icons/Fedora &>/dev/null || :
+  gtk-update-icon-cache %{_kde4_iconsdir}/oxygen &>/dev/null || :
 fi
 
 %posttrans
-if [ -x /usr/bin/gtk-update-icon-cache ]; then
-  if [ -f %{_datadir}/icons/Fedora/index.theme ]; then
-    gtk-update-icon-cache --quiet %{_datadir}/icons/Fedora || :
-  fi
-  if [ -f %{_kde4_iconsdir}/oxygen/index.theme ]; then
-    gtk-update-icon-cache --quiet %{_kde4_iconsdir}/oxygen/index.theme || :
-  fi
-fi
+gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+gtk-update-icon-cache %{_datadir}/icons/Bluecurve &>/dev/null || :
+gtk-update-icon-cache %{_datadir}/icons/Fedora &>/dev/null || :
+gtk-update-icon-cache %{_kde4_iconsdir}/oxygen &>/dev/null || :
 
 
 %clean
@@ -135,24 +138,26 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %doc COPYING COPYING-kde-logo README
+%config(noreplace) %{_sysconfdir}/favicon.png
 %{_datadir}/firstboot/themes/*
 %{_datadir}/anaconda/boot/*
 %{_datadir}/anaconda/pixmaps/*
-%{_datadir}/icons/Fedora/*/apps/*
+%{_datadir}/icons/hicolor/*/apps/*
+%{_datadir}/icons/hicolor/*/places/*
+%{_datadir}/icons/Bluecurve/*/apps/*
 %{_datadir}/pixmaps/*
-%exclude %{_datadir}/pixmaps/poweredby.png
 %{_datadir}/plymouth/themes/charge/*
-%{_kde4_appsdir}/ksplash/Themes/Leonidas/2048x1536/logo.png
 %{_kde4_iconsdir}/oxygen/
-# should be ifarch i386
-/boot/grub/splash.xpm.gz
-# end i386 bits
-
-%files httpd
-%doc COPYING
-%{_datadir}/pixmaps/poweredby.png
+%ifarch x86_64 i686
+%{_datadir}/anaconda/boot/splash.lss
+%endif
 
 %changelog
+* Tue Sep 06 2016 Vaughan <devel @ agrez dot net> - 24.0-1
+- Rename package
+- Add FedBerry logos and icons
+- Update spec & bump release
+
 * Thu Jun 16 2016 Vaughan <vaughan at agrez dot net> - 17.0.1-2
 - Rebuild for FedBerry 24
 
@@ -165,18 +170,6 @@ rm -rf %{buildroot}
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 17.0.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
-
-* Fri Nov 22 2013 Bill Nottingham <notting@redhat.com> - 17.0.0-5
-- Add a -httpd subpackage. (#1031288)
-
-* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 17.0.0-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
-
-* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 17.0.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
-
-* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 17.0.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Wed May  2 2012 Bill Nottingham <notting@redhat.com> - 17.0.0-1
 - update for Fedora 17 - .vol files for mactel boot
