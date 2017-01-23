@@ -1,10 +1,10 @@
 Name:       fedberry-logos
-Version:    24.0
+Version:    25.0
 Release:    1%{?dist}
 Summary:    Icons and pictures
 Group:      System Environment/Base
 URL:        https://github.com/fedberry/fedberry-logos
-Source0:    https://github.com/fedberry/fedberry-logos/raw/master/%{name}-%{version}.tar.bz2
+Source0:    https://github.com/fedberry/fedberry-logos/raw/master/%{name}-%{version}.tar.xz
 #The KDE Logo is under a LGPL license (no version statement)
 License:    GPLv2 and LGPLv2+
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -36,12 +36,6 @@ make
 
 %install
 rm -rf %{buildroot}
-
-%ifarch i686 x86_64
-mkdir -p %{buildroot}/boot/grub
-install -p -m 644 bootloader/splash.xpm.gz %{buildroot}/boot/grub/splash.xpm.gz
-%endif
-
 
 mkdir -p %{buildroot}%{_datadir}/firstboot/themes/generic
 for i in firstboot/* ; do
@@ -148,11 +142,14 @@ rm -rf %{buildroot}
 %{_datadir}/pixmaps/*
 %{_datadir}/plymouth/themes/charge/*
 %{_kde4_iconsdir}/oxygen/
-%ifarch x86_64 i686
-%{_datadir}/anaconda/boot/splash.lss
-%endif
+
 
 %changelog
+* Mon Jan 23 2017 Vaughan <devel @ agrez dot net> - 25.0-1
+- Drop powered-by logo
+- Remove x86 arch specific code
+- Source0 now compressed using xz
+
 * Tue Sep 06 2016 Vaughan <devel @ agrez dot net> - 24.0-1
 - Rename package
 - Add FedBerry logos and icons
