@@ -1,5 +1,5 @@
 Name:       fedberry-logos
-Version:    25.0
+Version:    25.1
 Release:    1%{?dist}
 Summary:    Icons and pictures
 Group:      System Environment/Base
@@ -145,6 +145,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Apr 06 2017 Vaughan <devel @ agrez dot net> - 25.1-1
+- Update FedBerry logos and icons for f25 release
+- Add FedBerry icons for plymouth 'Charge' theme
+
 * Mon Jan 23 2017 Vaughan <devel @ agrez dot net> - 25.0-1
 - Drop powered-by logo
 - Remove x86 arch specific code
