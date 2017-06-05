@@ -1,5 +1,5 @@
 Name:       fedberry-logos
-Version:    25.1
+Version:    25.2
 Release:    1%{?dist}
 Summary:    Icons and pictures
 Group:      System Environment/Base
@@ -145,6 +145,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jun 05 2017 Vaughan <devel @ agrez dot net> - 25.2-1
+- Update xfce4_xicon1.svg
+
 * Thu Apr 06 2017 Vaughan <devel @ agrez dot net> - 25.1-1
 - Update FedBerry logos and icons for f25 release
 - Add FedBerry icons for plymouth 'Charge' theme
